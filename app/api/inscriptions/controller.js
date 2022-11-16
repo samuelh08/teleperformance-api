@@ -2,6 +2,7 @@ const { Event, Inscription, User } = require('../models');
 
 exports.create = async (req, res, next) => {
   const { auth = {}, body = {} } = req;
+  // extract user id from token
   const { id: userId } = auth;
   const { category, eventId } = body;
 
@@ -9,6 +10,7 @@ exports.create = async (req, res, next) => {
     const user = await User.findOne({ where: { id: userId } });
     const event = await Event.findOne({ where: { id: eventId } });
 
+    // only allow advisors to register to events
     if (user.position === 'Asesor') {
       const inscription = await Inscription.create({
         category,
@@ -19,6 +21,7 @@ exports.create = async (req, res, next) => {
         data: inscription,
       });
     } else {
+      // add 1 to unauthorized attempts
       await Event.update(
         { unauthorizedAttempts: event.unauthorizedAttempts + 1 },
         { where: { id: eventId } },
@@ -30,6 +33,7 @@ exports.create = async (req, res, next) => {
       });
     }
   } catch (error) {
+    // add 1 to double attempts
     if (error.name === 'SequelizeUniqueConstraintError') {
       const event = await Event.findOne({ where: { id: eventId } });
       await Event.update(
@@ -37,6 +41,6 @@ exports.create = async (req, res, next) => {
         { where: { id: eventId } },
       );
     }
-    next(error);
+    next({ ...error, message: 'User already registered to this event' });
   }
 };

@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+// set configuration with environmental variables
 const config = {
   port: process.env.PORT,
   token: {

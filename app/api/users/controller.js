@@ -44,7 +44,9 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    // extract id from user
     const { id } = user;
+    // add id to token
     const token = sign({ id });
 
     // return user information when login is correct
