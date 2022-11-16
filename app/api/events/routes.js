@@ -5,8 +5,11 @@ const { auth } = require('../auth');
 
 const router = express.Router();
 
+// define api routes and methods for events
+
+// user must be authenticated to create an event
 router.route('/').post(auth, controller.create);
 
-router.route('/:id').put(auth, controller.update);
+router.route('/:id').get(controller.read).put(auth, controller.update);
 
 module.exports = router;

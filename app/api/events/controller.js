@@ -1,5 +1,6 @@
-const { Event, User } = require('../models');
+const { Event, User, Inscription } = require('../models');
 
+// Create new event
 exports.create = async (req, res, next) => {
   const { body = {} } = req;
   const { date } = body;
@@ -8,7 +9,6 @@ exports.create = async (req, res, next) => {
     const event = await Event.create({
       date,
     });
-
     res.json({
       data: event,
     });
@@ -17,6 +17,29 @@ exports.create = async (req, res, next) => {
   }
 };
 
+// get an event by its Id, Include the inscriptions to that event
+exports.read = async (req, res, next) => {
+  const { params } = req;
+  const { id } = params;
+
+  try {
+    const event = await Event.findOne({
+      where: { id },
+      include: [
+        {
+          model: Inscription,
+        },
+      ],
+    });
+    res.json({
+      data: event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// update event date, only allowed to Directors
 exports.update = async (req, res, next) => {
   const { params, auth = {}, body = {} } = req;
   const { date } = body;
@@ -24,6 +47,7 @@ exports.update = async (req, res, next) => {
   const { id } = params;
 
   try {
+    // get userId from token
     const user = await User.findOne({ where: { id: userId } });
     if (user.position === 'Director') {
       await Event.update({ date }, { where: { id } });
