@@ -1,5 +1,7 @@
-const User = require('./model');
+const { User } = require('../models');
+const { sign } = require('../auth');
 
+// Create user
 exports.signup = async (req, res, next) => {
   const { body = {} } = req;
 
@@ -14,11 +16,15 @@ exports.signup = async (req, res, next) => {
   }
 };
 
+// Login controller
 exports.login = async (req, res, next) => {
+  // extract body from request
   const { body = {} } = req;
+  // extract Id and password from body
   const { employeeId = '', password = '' } = body;
 
   try {
+    // find user in database
     const user = await User.findOne({ where: { employeeId } });
     if (!user) {
       return next({
@@ -28,6 +34,7 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    //verify password is correct
     const verified = await user.verifyPassword(password);
     if (!verified) {
       return next({
@@ -37,14 +44,22 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    const { id } = user;
+    const token = sign({ id });
+
+    // return user information when login is correct
     res.json({
       data: user,
+      meta: {
+        token,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
+// Read all users, hide passwords
 exports.all = async (req, res, next) => {
   try {
     const data = await User.findAll({
