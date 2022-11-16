@@ -15,9 +15,9 @@ app.use((req, res, next) => {
   });
 });
 
-app.use((req, res, next) => {
+app.use((error, req, res, next) => {
   let { statusCode = 500 } = error;
-  const { name } = error;
+  const { name = '' } = error;
 
   if (name.startsWith('Sequelize')) {
     if (name === 'SequelizeUniqueConstraintError') {
