@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 
 const api = require('./api');
 
 const app = express();
 
+app.use(cors());
 // Parse request body to JSON
 app.use(express.json());
 
