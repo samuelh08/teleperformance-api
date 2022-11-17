@@ -17,12 +17,12 @@ const Inscription = sequelize.define(
   },
   {
     timestamps: true,
-    // only one inscription per user for each event
+    // only one inscription per user for each event category
     indexes: [
       {
         name: 'unique_index',
         unique: true,
-        fields: ['eventId', 'userId'],
+        fields: ['eventId', 'userId', 'category'],
       },
     ],
   },

@@ -41,6 +41,9 @@ exports.create = async (req, res, next) => {
         { where: { id: eventId } },
       );
     }
-    next({ ...error, message: 'User already registered to this event' });
+    next({
+      ...error,
+      message: 'User already registered to this event category',
+    });
   }
 };
