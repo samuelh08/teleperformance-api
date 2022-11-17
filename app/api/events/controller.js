@@ -17,6 +17,16 @@ exports.create = async (req, res, next) => {
   }
 };
 
+// get all events
+exports.all = async (req, res, next) => {
+  try {
+    const data = await Event.findAll({});
+    res.json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // get an event by its Id, Include the inscriptions to that event
 exports.read = async (req, res, next) => {
   const { params } = req;
@@ -28,6 +38,14 @@ exports.read = async (req, res, next) => {
       include: [
         {
           model: Inscription,
+          include: [
+            {
+              model: User,
+              attributes: {
+                exclude: ['password'],
+              },
+            },
+          ],
         },
       ],
     });
